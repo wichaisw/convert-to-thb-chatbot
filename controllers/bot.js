@@ -45,15 +45,18 @@ const convertCurrency = async(ctx) => {
     type: 'text',
     text: 'Hello World!'
   };
-  
-  client.replyMessage('<replyToken>', message)
+
+  client.replyMessage(ctx.request.body.events[0].replyToken, message)
     .then(() => {
+      ctx.response.status = 200;
+      ctx.body = message;
     })
     .catch((err) => {
+      ctx.response.status = 400;
+      ctx.body = 'error occured';
     });
 
-  ctx.response.status = 200;
-  ctx.body = 'success'
+
 }
 
 module.exports = {
