@@ -5,6 +5,7 @@ const json = require('koa-json');
 const cors = require('@koa/cors');
 require('dotenv').config();
 const line = require('@line/bot-sdk');
+const koaRequest = require('koa-http-request');
 
 const { convertToThbConfig }  = require('./config');
 
