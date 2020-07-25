@@ -42,6 +42,6 @@ app.use(
   botRoutes.prefix('/bot').routes()
 );
 
-const server = app.listen(8000, () => {
-  console.log(`server is running on ${server.address().port}`);
+const server = app.listen(process.env.PORT, () => {
+  console.log(`server is running on ${process.env.PORT}`);
 })
