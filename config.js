@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const convertToThbConfig = {
   "Content-Type": "application/json",
   Authorization: `Bearer ${process.env.LINE_CHANNEL_ACCESS_TOKEN}`,

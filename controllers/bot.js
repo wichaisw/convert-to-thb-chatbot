@@ -1,8 +1,4 @@
-// const Koa = require('koa');
-// const app = new Koa();
-const koaRequest = require('koa-http-request');
 const axios = require('axios');
-require('dotenv').config();
 
 const line = require('@line/bot-sdk');
 const { convertToThbConfig } = require('../config');
@@ -47,43 +43,61 @@ const convertCurrency = async(ctx) => {
     channelAccessToken: convertToThbConfig.channelAccessToken
   });
   const clientMessage = ctx.request.body.events[0].message
-  let result;
+  const defaultCurrency = 'USD'
+  let currency;
+  let amount;
+  let twoDecimalResult;
 
+  function twoDecimalRound(value) {
+    return Number(Math.round(value+'e+2')+'e-2');
+  }
+
+  // currency converting
   try{
     if(clientMessage.type === 'text') {
-      let formattedMessage = clientMessage.text.toLowerCase().replace(/\s|,/g, '')
+      let formattedMessage = clientMessage.text.toUpperCase().replace(/\s|,/g, '')
       console.log('formatted Message', formattedMessage)
+      
+      // if there's no currency input, default currency is USD
+      currency = ( isNaN(formattedMessage.slice(-3)) ) ? formattedMessage.slice(-3) : defaultCurrency;
       amount = parseFloat(formattedMessage);
-      let exchangeRate = await axios.get(`https://api.exchangeratesapi.io/latest?base=USD&symbols=THB`)
+      let exchangeRate = await axios.get(`https://api.exchangeratesapi.io/latest?base=${currency}&symbols=THB`)
       let thbRate = exchangeRate.data.rates.THB
       console.log(exchangeRate.data)  
       console.log(thbRate) 
-  
-      // make toFixed more accurate
-      accurrateResult = Number((String(((amount * thbRate) * 100)) + "1")/100)
-      result = Number(accurrateResult.toFixed(2))
+
+      twoDecimalResult = twoDecimalRound(amount * thbRate)
     }
     
-    console.log(result.toLocaleString());
-  
+    console.log(twoDecimalResult.toLocaleString());
   } catch(err) {
-    console.log('error in conversion', err)
-    ctx.response.status = 400;
-    ctx.body = 'error occured';
+    console.log('error in conversion')
+    const currencyErrorMessage = [
+      {
+        type: 'text',
+        text: `โปรดใส่รหัสย่อสกุลเงิน 3 ตัวอักษรให้ถูกต้อง`
+      }
+    ]
+    client.replyMessage(ctx.request.body.events[0].replyToken, currencyErrorMessage)
+      .then(() => {
+        ctx.response.status = 400;
+        ctx.body = currencyErrorMessage;
+      })
   }
 
   const message = [
     {
       type: 'text',
-      text: `${result.toLocaleString()} THB`
+      text: `${amount.toLocaleString()} ${currency} = ${twoDecimalResult.toLocaleString()} THB`
     },
   ];
 
-  console.log('result test', result)
-  if(isNaN(result)) {
+  console.log('result test', twoDecimalResult)
+  if(isNaN(twoDecimalResult)) {
     message[0].text = 'กรุณาใส่ตัวเลขที่ต้องการแปลงสกุลเงิน'
   }
 
+  // reply to a client
   client.replyMessage(ctx.request.body.events[0].replyToken, message)
     .then(() => {
       ctx.response.status = 200;
