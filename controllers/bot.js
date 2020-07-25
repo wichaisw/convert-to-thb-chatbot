@@ -14,7 +14,7 @@ const convertCurrency = async(ctx) => {
   let twoDecimalResult;
 
   function twoDecimalRound(value) {
-    return Number(Math.round(value+'e+2')+'e-2');
+    return Number(Math.round(value+'e2')+'e-2');
   }
 
 
