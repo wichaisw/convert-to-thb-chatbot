@@ -13,10 +13,10 @@
     "@koa/cors": "^3.1.0",
     "@line/bot-sdk": "^7.0.0",
     "axios": "^0.19.2",
+    "crypto": "^1.0.1",
     "dotenv": "^8.2.0",
     "koa": "^2.13.0",
     "koa-bodyparser": "^4.3.0",
-    "koa-http-request": "^2.2.1",
     "koa-json": "^2.0.2",
     "koa-router": "^9.1.0"
   }

@@ -1,6 +1,7 @@
 const axios = require('axios');
 const line = require('@line/bot-sdk');
 const { convertToThbConfig } = require('../config');
+const crypto = require('crypto');
 
 const convertCurrency = async(ctx) => {
   const client = new line.Client({
@@ -16,17 +17,18 @@ const convertCurrency = async(ctx) => {
     return Number(Math.round(value+'e+2')+'e-2');
   }
 
+
   // currency converting
   try{
     if(clientMessage.type === 'text') {
       let formattedMessage = clientMessage.text.toUpperCase().replace(/\s|,/g, '')
-      
       // if there's no currency input, default currency is USD
       currency = ( isNaN(formattedMessage.slice(-3)) ) ? formattedMessage.slice(-3) : defaultCurrency;
       amount = parseFloat(formattedMessage);
       let exchangeRate = await axios.get(`https://api.exchangeratesapi.io/latest?base=${currency}&symbols=THB`)
-      let thbRate = exchangeRate.data.rates.THBว
+      let thbRate = exchangeRate.data.rates.THB;
       twoDecimalResult = twoDecimalRound(amount * thbRate)
+
     }
   } catch(err) {
     console.log('error in conversion')
